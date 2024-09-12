@@ -121,14 +121,16 @@ const Clock: React.FC<ClockProps> = ({ side, spc }) => {
 
     const handleNext = () => {
         const newDate = currTime.add(5, "minute");
-        setCurrTime(newDate);
         updateSquares(newDate);
+        setCurrTime(newDate);
+
     };
 
     const handleBack = () => {
         const newDate = currTime.subtract(5, "minute");
-        setCurrTime(newDate);
         updateSquares(newDate);
+        setCurrTime(newDate);
+
     };
 
     useEffect(() => {
@@ -174,7 +176,7 @@ const Clock: React.FC<ClockProps> = ({ side, spc }) => {
                     <Square key={idx} squareProps={squareProps} />
                 ))}
             </div>
-            <p className="time">{time}</p>
+            <p className="time">{currTime.format("h:mm")}</p>
 
         </>
     );
