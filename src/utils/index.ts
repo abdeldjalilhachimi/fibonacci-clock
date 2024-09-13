@@ -36,7 +36,8 @@ export function initializeAllPossibleTimeColorMapping() {
 
     for (let i = 0; i < bitSeqs.length; i++) {
         const bs = bitSeqs[i];
-        const timeKey = bs[0] + bs[1] + bs[2] * 2 + bs[3] * 3 + bs[4] * 5;
+        const timeKey = bs.reduce((acc, bit, index) => acc + (bit ? Math.pow(2, index) : 0), 0);
+        //const timeKey = bs[0] + bs[1] + bs[2] * 2 + bs[3] * 3 + bs[4] * 5;
         if (allTimeUnitSeq[timeKey]) {
             allTimeUnitSeq[timeKey].push(bs);
             allHourSeqs[timeKey].push(redSeqs[i]);
