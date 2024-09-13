@@ -1,12 +1,11 @@
-import { format } from 'date-fns'
 
 type TimeMonitorProps = {
-    currentTime: Date
+    currentTime: string
 }
 
 const TimeMonitor = ({ currentTime }: TimeMonitorProps) => {
     return (
-        <p>Current Time: {format(currentTime, "HH:mm")}</p>
+        <p className="time">{currentTime}</p>
     )
 }
 

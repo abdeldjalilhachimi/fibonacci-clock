@@ -1,42 +1,106 @@
-export function getColorClass(state: number) {
-    switch (state) {
-        case 1: return 'bg-red';
-        case 2: return 'bg-green';
-        case 3: return 'bg-blue';
-        default: return 'bg-white';
-    }
-}
-export function generateRandomClockState({ currentTime }: { currentTime: Date }) {
-    const hours = currentTime.getHours() % 12 || 12; // Convert 0 to 12 for midnight
-    const minutes = Math.floor(currentTime.getMinutes() / 5) * 5;
+import { Dayjs } from "dayjs";
+import _ from "underscore";
+import { FibClockColorKeys, fibClockColors } from "../types";
+import { CSSProperties } from "react";
 
-    const targetHourSum = hours;
-    const targetMinuteSum = minutes / 5; // Each square represents 5 minutes
+const allHourSeqs: Record<number, string[][]> = {};
+const allMinutesSeqs: Record<number, string[][]> = {};
 
-    const squares = [1, 1, 2, 3, 5];
-    const validStates = [];
 
-    // Generate all possible states
-    for (let i = 0; i < 3 ** 5; i++) {
-        const state = i.toString(3).padStart(5, '0').split('').map(Number);
-        let hourSum = 0;
-        let minuteSum = 0;
-
-        for (let j = 0; j < 5; j++) {
-            if (state[j] === 1 || state[j] === 3) hourSum += squares[j];
-            if (state[j] === 2 || state[j] === 3) minuteSum += squares[j];
-        }
-
-        if (hourSum === targetHourSum && minuteSum === targetMinuteSum) {
-            validStates.push(state);
-        }
-    }
-
-    // If no valid states found, return all white
-    if (validStates.length === 0) return [0, 0, 0, 0, 0];
-
-    // Return a random valid state
-    return validStates[Math.floor(Math.random() * validStates.length)];
+export const SQUARE_RATIO = {
+    side: 75,
+    spc: .5
 }
 
-export const FIBONACCI = [1, 1, 2, 3, 5];
+
+export function initializeAllPossibleTimeColorMapping() {
+    const bitSeqs: boolean[][] = [];
+    const redSeqs: string[][] = [];
+    const greenSeqs: string[][] = [];
+    const allTimeUnitSeq: Record<number, boolean[][]> = {};
+
+    const maxNumOSeqs = 32;
+    for (let i = 0; i < maxNumOSeqs; i++) {
+        const bits = new Array(5);
+        const red = new Array(5);
+        const green = new Array(5);
+        for (let j = 4; j >= 0; j--) {
+            bits[j] = (i & (1 << j)) !== 0;
+            red[j] = bits[j] ? "red" : "";
+            green[j] = bits[j] ? "green" : "";
+        }
+        redSeqs.push(red);
+        greenSeqs.push(green);
+        bitSeqs.push(bits);
+    }
+
+    for (let i = 0; i < bitSeqs.length; i++) {
+        const bs = bitSeqs[i];
+        const timeKey = bs[0] + bs[1] + bs[2] * 2 + bs[3] * 3 + bs[4] * 5;
+        if (allTimeUnitSeq[timeKey]) {
+            allTimeUnitSeq[timeKey].push(bs);
+            allHourSeqs[timeKey].push(redSeqs[i]);
+            allMinutesSeqs[timeKey].push(greenSeqs[i]);
+        } else {
+            allTimeUnitSeq[timeKey] = [bs];
+            allHourSeqs[timeKey] = [redSeqs[i]];
+            allMinutesSeqs[timeKey] = [greenSeqs[i]];
+        }
+    }
+}
+
+export function getColoringForTime(hh: number, mm: number) {
+    const matchingHourSeqs = allHourSeqs[hh];
+    const matchingMinSeqs = allMinutesSeqs[mm];
+    const potentialSquareColors: string[][] = [];
+
+    for (let i = 0; i < matchingHourSeqs.length; i++) {
+        for (let j = 0; j < matchingMinSeqs.length; j++) {
+            const zipped = _.zip(matchingHourSeqs[i], matchingMinSeqs[j]);
+            const colorSeq = _.map(zipped, (hourMinArray) => hourMinArray[0] + hourMinArray[1]);
+            potentialSquareColors.push(colorSeq);
+        }
+    }
+
+    const randSel = getRandomInt(0, potentialSquareColors.length);
+    return _.map(potentialSquareColors[randSel], (col) => {
+        if (col === "red" || col === "green") return col;
+        if (col === "redgreen") return "blue";
+        return "white";
+    });
+}
+
+export function getColoringForDate(dateOrig: Dayjs) {
+    let hours = dateOrig.get('hours');
+    const minutes = dateOrig.get('minutes');
+
+    if (hours > 12) hours -= 12;
+
+    let minsScaled = Math.floor(minutes / 5);
+    if (minutes === 0) minsScaled = 12;
+
+    return getColoringForTime(hours, minsScaled);
+}
+
+function getRandomInt(min: number, max: number) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+export const clockProps: React.CSSProperties = {
+    height: SQUARE_RATIO.side * 5 + 4 * SQUARE_RATIO.spc,
+    width: SQUARE_RATIO.side * 8 + 4 * SQUARE_RATIO.spc,
+    margin: "auto",
+    position: "relative",
+};
+
+
+export const generateSquareProps = (colors: FibClockColorKeys[]): CSSProperties[] => [
+    { height: SQUARE_RATIO.side * 2 + 2 * SQUARE_RATIO.spc, width: SQUARE_RATIO.side * 2, top: 0, left: 0, backgroundColor: fibClockColors[colors[2]], position: "absolute" },
+    { height: SQUARE_RATIO.side, width: SQUARE_RATIO.side, top: 0, left: SQUARE_RATIO.side * 2 + 2 * SQUARE_RATIO.spc, backgroundColor: fibClockColors[colors[0]], position: "absolute" },
+    { height: SQUARE_RATIO.side, width: SQUARE_RATIO.side, top: SQUARE_RATIO.side + 2 * SQUARE_RATIO.spc, left: SQUARE_RATIO.side * 2 + 2 * SQUARE_RATIO.spc, backgroundColor: fibClockColors[colors[1]], position: "absolute" },
+    { height: SQUARE_RATIO.side * 3, width: SQUARE_RATIO.side * 3 + 2 * SQUARE_RATIO.spc, bottom: 0, left: 0, backgroundColor: fibClockColors[colors[3]], position: "absolute" },
+    { height: SQUARE_RATIO.side * 5 + 4 * SQUARE_RATIO.spc, width: SQUARE_RATIO.side * 5, top: 0, right: 0, backgroundColor: fibClockColors[colors[4]], position: "absolute" },
+];
