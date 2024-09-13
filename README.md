@@ -19,38 +19,38 @@ A React application that displays a clock with Fibonacci-based color coding and 
 
 1. **Clone the Repository**
 
-    \`\`\`bash
-    git clone https://github.com/abdeldjalilhachimi/fibonacci-clock.git
-    cd fibonacci-clock
-    \`\`\`
+```bash
+  git clone https://github.com/abdeldjalilhachimi/fibonacci-clock.git
+  cd fibonacci-clock
+```
 
 2. **Install Dependencies**
 
     Using npm:
 
-    \`\`\`bash
+    ```bash
     npm install
-    \`\`\`
+    ```
 
     Or using yarn:
 
-    \`\`\`bash
+    ```bash
     yarn install
-    \`\`\`
+    ```
 
 3. **Run the Application**
 
     Using npm:
 
-    \`\`\`bash
-    npm run dev
-    \`\`\`
+    ```bash
+     npm run dev
+    ```
 
     Or using yarn:
 
-    \`\`\`bash
+    ```bash
     yarn dev
-    \`\`\`
+    ```
 
     This will start the development server and open the application in your default web browser.
 
@@ -62,55 +62,55 @@ A React application that displays a clock with Fibonacci-based color coding and 
 
 ## Functions
 
-### \`initializeAllPossibleTimeColorMapping\`
+### initializeAllPossibleTimeColorMapping
 
 Initializes all possible color mappings for time units. This function sets up data structures that map time keys to possible color sequences for hours and minutes.
 
 **Usage:**
 
-\`\`\`typescript
+```typescript
 initializeAllPossibleTimeColorMapping();
-\`\`\`
+```
 
-### \`getColoringForDate\`
+### getColoringForDate
 
-Given a \`Dayjs\` object, this function returns an array of color keys based on the provided time.
+Given a `Dayjs` object, this function returns an array of color keys based on the provided time.
 
 **Parameters:**
 
--   \`dateOrig\` (Dayjs): The date object representing the current time.
+-   `dateOrig` (Dayjs): The date object representing the current time.
 
 **Returns:**
 
--   \`FibClockColorKeys[]\`: An array of color keys representing the color coding for the time.
+-   `FibClockColorKeys[]`: An array of color keys representing the color coding for the time.
 
 **Usage:**
 
-\`\`\`typescript
+```typescript
 const colors = getColoringForDate(dayjs());
-\`\`\`
+```
 
-### \`generateSquareProps\`
+### generateSquareProps
 
 Generates CSS properties for rendering squares based on the color keys.
 
 **Parameters:**
 
--   \`colors\` (FibClockColorKeys[]): An array of color keys.
+-   `colors` (FibClockColorKeys[]): An array of color keys.
 
 **Returns:**
 
--   \`CSSProperties[]\`: An array of style objects for each square.
+-   `CSSProperties[]`: An array of style objects for each square.
 
 **Usage:**
 
-\`\`\`typescript
+```typescript
 const squareProps = generateSquareProps(colors);
-\`\`\`
+```
 
 ## Component Overview
 
-### \`Clock\`
+### Clock
 
 The main component that manages the clock display and user interactions.
 
@@ -120,7 +120,7 @@ The main component that manages the clock display and user interactions.
 -   Renders squares based on current time and color mapping.
 -   Includes a footer with copyright information.
 
-### \`TimeMonitor\`
+### TimeMonitor
 
 A component that displays the current time.
 
@@ -128,7 +128,7 @@ A component that displays the current time.
 
 -   \`currentTime\` (string): The formatted current time.
 
-### \`Button\`
+### Button
 
 A reusable button component.
 
@@ -137,12 +137,10 @@ A reusable button component.
 -   \`label\` (string): The text displayed on the button.
 -   \`onClick\` (function): Function to call when the button is clicked.
 
-### \`TimeSquaresGenerator\`
+### TimeSquaresGenerator
 
 A component that generates and renders time squares based on provided style properties.
 
 **Props:**
 
--   \`squareProps\` (CSSProperties): The style properties for the square.
-
-
+-   squareProps (CSSProperties): The style properties for the square.
